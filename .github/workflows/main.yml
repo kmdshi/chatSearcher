@@ -1,0 +1,30 @@
+name: CI/CD 
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest 
+
+    steps:
+    - name: Deploy using ssh 
+      uses: appleboy/ssh-action@master 
+      with:
+        host: ${{ secrets.HOST }} 
+        username: ${{ secrets.USERNAME }} 
+        key: ${{ secrets.PRIVATE_KEY }} 
+        port: 22 
+        script: |
+          cd ~/chatSearcher
+          git pull origin main
+          source venv/bin/activate
+          pip install -r src/requirements.txt
+           if [ -f bot.pid ]; then
+              kill $(cat bot.pid) || true
+              rm bot.pid
+            fi
+
+            nohup python3 src/bot.py > bot.log 2>&1 & echo $! > bot.pid
+      
