@@ -1,6 +1,6 @@
 import aiosqlite
 from pathlib import Path
-from sys import argv
+from config import Config
 
 
 class Database:
@@ -14,8 +14,7 @@ class Database:
         return cls._instance
 
     def __init__(self):
-        script_dir = Path(argv[0]).parent.resolve()
-        db_path = script_dir / 'utils' / 'database.db'
+        db_path = Config.DB_PATH
         self.db_path = db_path
 
     async def close(self):
