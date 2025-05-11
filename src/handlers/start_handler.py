@@ -12,4 +12,4 @@ start_router = Router()
 async def start_message_handler(message: Message):
     kb = create_main_kb()
     await db.Database().register_user(message.from_user.id)
-    await message.answer(f'Пока!', reply_markup=kb)
+    await message.answer(f'Хе-хе! Совсем скоро ^-^', reply_markup=kb)
