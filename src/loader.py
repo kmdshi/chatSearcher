@@ -1,6 +1,6 @@
 import logging
 
-from handlers import start_handler, chats_handler, additional_handler, adding_handler
+from handlers import start_handler, chats_handler, additional_handler, adding_handler, moderation_handler
 from aiogram_dialog import setup_dialogs
 from aiogram import Bot, Dispatcher
 
@@ -24,11 +24,14 @@ logger = logging.getLogger(__name__)
 
 
 def load_routers():
-    dp.include_router(start_handler.start_router)
-    dp.include_router(additional_handler.additional_router)
-    dp.include_router(adding_handler.adding_router)
-    dp.include_router(chats_handler.chats_dialog)
-    dp.include_router(chats_handler.chats_router)
+    dp.include_routers(
+        moderation_handler.moderation_router,
+        start_handler.start_router,
+        additional_handler.additional_router,
+        adding_handler.adding_router,
+        chats_handler.chats_dialog,
+        chats_handler.chats_router,
+    )
 
 
 async def on_start():

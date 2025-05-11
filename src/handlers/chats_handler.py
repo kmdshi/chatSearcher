@@ -23,7 +23,7 @@ async def get_topics(dialog_manager: DialogManager, **kwargs):
     raw_topics = await db.Database().get_topics()
 
     return {
-        "topics": [
+        "topics": [] if raw_topics is None else [
             (row['id'], row['text'])
             for row in raw_topics
         ]
@@ -35,7 +35,7 @@ async def get_chats(dialog_manager: DialogManager, **kwargs):
     raw_chats = await db.Database().get_topic_chats(topic_id)
 
     return {
-        "chats": [
+        "chats": [] if raw_chats is None else [
             (row['link'], row['title'])
             for row in raw_chats
         ]

@@ -39,7 +39,9 @@ class Database:
             CREATE TABLE IF NOT EXISTS topics (
                 id INTEGER PRIMARY KEY,
                 creator_id INTEGER,
-                topic_theme TEXT
+                topic_theme TEXT,
+                is_approved BOOLEAN DEFAULT 0
+
             )
             """)
 
@@ -50,6 +52,7 @@ class Database:
                 topic_id INTEGER,
                 creator_id INTEGER,
                 chat_link TEXT,
+                is_approved BOOLEAN DEFAULT 0,
                 FOREIGN KEY(topic_id) REFERENCES topics(id)
             )
             """)
@@ -70,7 +73,7 @@ class Database:
 
             await db.commit()
 
-    async def register_chat(self, topic_id, creator_id, chat_link, chat_name):
+    async def register_chat(self, topic_id, creator_id, chat_link, chat_name) -> int:
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.cursor()
             await cursor.execute("PRAGMA foreign_keys = ON;")
@@ -81,12 +84,13 @@ class Database:
             )
 
             await db.commit()
+            return cursor.lastrowid
 
     async def get_topics(self):
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.cursor()
 
-            await cursor.execute("SELECT topic_theme, id FROM topics")
+            await cursor.execute("SELECT topic_theme, id FROM topics WHERE is_approved = 1")
             result = await cursor.fetchall()
 
             if result:
@@ -102,7 +106,35 @@ class Database:
             if result:
                 return [{"title": row[0], "link": row[1]} for row in result]
 
-    async def register_topic(self, topic_theme, creator_id):
+    async def approve_topic_adding(self, topicID):
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute("UPDATE topics SET is_approved = 1 WHERE id = ?", (topicID,))
+            await db.commit()
+
+    async def reject_topic_adding(self, topicID):
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute("DELETE FROM topics WHERE id = ?", (topicID,))
+            await db.commit()
+
+    async def approve_chat_adding(self, chatID):
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute("UPDATE chats SET is_approved = 1 WHERE id = ?", (chatID,))
+            await db.commit()
+
+    async def reject_chat_adding(self, chatID):
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute("DELETE FROM chats WHERE id = ?", (chatID,))
+            await db.commit()
+
+    async def register_topic(self, topic_theme, creator_id) -> int:
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.cursor()
 
@@ -112,6 +144,7 @@ class Database:
             )
 
             await db.commit()
+            return cursor.lastrowid
 
     async def get_chat_link_by_id(self, chat_id: int) -> str:
         async with aiosqlite.connect(self.db_path) as db:
@@ -122,3 +155,20 @@ class Database:
 
             if result:
                 return result[0]
+
+    async def get_chat_by_title(self, title: str) -> bool:
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute("SELECT id FROM chats WHERE chat_name  = ?", (title,))
+            result = await cursor.fetchone()
+
+            if result:
+                return result[0]
+
+    async def delete_chat_by_title(self, title: str) -> bool:
+        async with aiosqlite.connect(self.db_path) as db:
+            cursor = await db.cursor()
+
+            await cursor.execute("DELETE FROM chats WHERE chat_name = ?", (title,))
+            await db.commit()

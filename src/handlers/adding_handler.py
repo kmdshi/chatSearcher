@@ -3,9 +3,8 @@ from aiogram.types import Message
 from services import db
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiogram.filters import Command, StateFilter
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from keyboards import cancel_keyboard, main_keyboard
+from aiogram.filters import StateFilter
+from keyboards import cancel_keyboard, main_keyboard, mods_keyboard
 adding_router = Router()
 
 
@@ -43,8 +42,20 @@ async def cancel_handler(message: Message, state: FSMContext):
 async def process_name(message: Message, state: FSMContext):
     await state.clear()
 
-    await db.Database().register_topic(message.text, message.from_user.id)
-    await message.reply(f"Успешно создано, {message.text}")
+    main_kb = main_keyboard.create_main_kb()
+
+    sender_id = message.from_user.id
+    topic_id = await db.Database().register_topic(message.text, message.from_user.id)
+    await message.reply(f"Топик успешно отправлен на модерацию.", reply_markup=main_kb)
+
+    kb = mods_keyboard.approve_buttons(topic_id, sender_id)
+
+    await message.bot.send_message(
+        chat_id=1125496753,
+        text=f"🆕 Новая заявка на топик:\n\n📌 <b>{message.text}</b>\n👤 От пользователя: @{message.from_user.username or message.from_user.id}",
+        reply_markup=kb,
+        parse_mode="HTML"
+    )
 
 
 @adding_router.message(F.text == '➕ Добавить чат')
@@ -89,6 +100,10 @@ async def process_topic_selection(message: Message, state: FSMContext):
 
 @adding_router.message(StateFilter(ChatForm.name))
 async def process_chat_name(message: Message, state: FSMContext):
+    if len(message.text) > 10:
+        message.answer("Название чата должно быть менее 10 символов")
+        return
+
     await state.update_data(name=message.text)
     await state.set_state(ChatForm.chat_link)
     await message.answer("Введите ссылку на чат:")
@@ -102,12 +117,23 @@ async def process_chat_link(message: Message, state: FSMContext):
     topic_id = data.get("topic_id")
     name = data.get("name")
     link = message.text
+    sender_id = message.from_user.id
 
     if not link.startswith("https://t.me/"):
         await message.reply("Сейчас разрешены только телеграм-чаты. Пожалуйста измените ссылку.")
         return
 
-    await db.Database().register_chat(topic_id=topic_id, creator_id=message.from_user.id, chat_name=name, chat_link=link)
+    chat_id = await db.Database().register_chat(topic_id=topic_id, creator_id=message.from_user.id, chat_name=name, chat_link=link)
 
-    await message.answer("Чат успешно добавлен ✅", reply_markup=kb)
+    await message.reply(f"Чат успешно отправлен на модерацию.", reply_markup=kb)
     await state.clear()
+
+    kb = mods_keyboard.approve_buttons(
+        chat_id, sender_id, True)
+
+    await message.bot.send_message(
+        chat_id=1125496753,
+        text=f"🆕 Новая заявка на чат:\n\n📌 <b>{message.text}</b>\n👤 От пользователя: @{message.from_user.username or message.from_user.id}",
+        reply_markup=kb,
+        parse_mode="HTML"
+    )
