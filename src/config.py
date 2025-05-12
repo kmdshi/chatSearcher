@@ -6,7 +6,7 @@ env = "prod"
 if len(sys.argv) > 1 and sys.argv[1] == "dev":
     env = "dev"
 
-env_file = "src/.env.dev" if env == "dev" else "src/.env"
+env_file = "src/.env.dev" if env == "dev" else "/root/chatSearcher/.env"
 load_dotenv(dotenv_path=env_file)
 
 
