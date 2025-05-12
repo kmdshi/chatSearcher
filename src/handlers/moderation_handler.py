@@ -21,13 +21,14 @@ async def handle_moderation_action(callback: CallbackQuery, state: FSMContext):
     sender_id = int(sender_id_str)
     table = "topics" if action.startswith("topic") else "chats"
 
-    print(
-        f"Action: {action}, Content ID: {content_id}, Sender ID: {sender_id}, Table: {table}")
-
     if "approve" in action:
         await db.Database().approve_topic_adding(topicID=content_id)
         await callback.message.edit_text("✅ Топик одобрен.")
-        await callback.bot.send_message(sender_id, "Ваш топик был одобрен ✅")
+        await callback.bot.send_message(
+            sender_id,
+            "<b>Ваш топик был одобрен</b> ✅",
+            parse_mode="HTML"
+        )
     else:
 
         await callback.message.answer("Введите причину отказа:")
@@ -45,7 +46,6 @@ async def handle_delete_command(message: Message):
         return
 
     chat_title = message.text.split(' ')[1]
-   
 
     chat = await db.Database().get_chat_by_title(chat_title)
 
@@ -65,13 +65,14 @@ async def handle_chat_moderation_action(callback: CallbackQuery, state: FSMConte
     sender_id = int(sender_id_str)
     table = "topics" if action.startswith("topic") else "chats"
 
-    print(
-        f"Action: {action}, Content ID: {content_id}, Sender ID: {sender_id}, Table: {table}")
-
     if "approve" in action:
         await db.Database().approve_chat_adding(chatID=content_id)
         await callback.message.edit_text("✅ Чат одобрен.")
-        await callback.bot.send_message(sender_id, "Ваш чат был одобрен ✅")
+        await callback.bot.send_message(
+            sender_id,
+            "<b>Ваш чат был одобрен</b> ✅",
+            parse_mode="HTML"
+        )
     else:
 
         await callback.message.answer("Введите причину отказа:")
@@ -94,5 +95,9 @@ async def process_reject_reason(message: Message, state: FSMContext):
         await db.Database().reject_chat_adding(chatID=content_id)
 
     await message.answer("❌ Заявка отклонена и удалена.")
-    await message.bot.send_message(sender_id, f"Ваша заявка была отклонена.\nПричина: {reason}")
+    await message.bot.send_message(
+        sender_id,
+        f"🚫 <b>Ваша заявка была отклонена</b>.\n\n📝 <i>Причина:</i> {reason}",
+        parse_mode="HTML"
+    )
     await state.clear()

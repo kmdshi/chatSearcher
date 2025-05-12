@@ -3,7 +3,6 @@ import logging
 from handlers import start_handler, chats_handler, additional_handler, adding_handler, moderation_handler
 from aiogram_dialog import setup_dialogs
 from aiogram import Bot, Dispatcher
-
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums.parse_mode import ParseMode
 from config import Config
@@ -30,6 +29,7 @@ def load_routers():
         additional_handler.additional_router,
         adding_handler.adding_router,
         chats_handler.chats_dialog,
+        adding_handler.chats_adding_dialog,
         chats_handler.chats_router,
     )
 

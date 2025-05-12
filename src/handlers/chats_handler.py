@@ -44,7 +44,6 @@ async def get_chats(dialog_manager: DialogManager, **kwargs):
 
 async def on_topic_selected(event, source, manager: DialogManager, item_id: int, **kwargs):
     manager.dialog_data["selected_topic"] = item_id
-
     await manager.switch_to(DialogSG.chats)
 
 

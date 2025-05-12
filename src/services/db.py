@@ -99,7 +99,7 @@ class Database:
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.cursor()
 
-            await cursor.execute("SELECT chat_name, chat_link FROM chats WHERE topic_id = ?", (topicID,))
+            await cursor.execute("SELECT chat_name, chat_link FROM chats WHERE topic_id = ? AND is_approved = 1", (topicID,))
             result = await cursor.fetchall()
 
             if result:

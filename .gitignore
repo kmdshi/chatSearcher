@@ -129,6 +129,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.dev
+.env.test
 .venv
 env/
 venv/
@@ -175,4 +177,4 @@ cython_debug/
 
 # database
 
-.db
+*.db
