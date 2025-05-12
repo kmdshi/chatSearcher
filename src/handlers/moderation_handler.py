@@ -21,6 +21,7 @@ async def handle_moderation_action(callback: CallbackQuery, state: FSMContext):
     sender_id = int(sender_id_str)
     table = "topics" if action.startswith("topic") else "chats"
 
+
     if "approve" in action:
         await db.Database().approve_topic_adding(topicID=content_id)
         await callback.message.edit_text("✅ Топик одобрен.")
@@ -64,6 +65,7 @@ async def handle_chat_moderation_action(callback: CallbackQuery, state: FSMConte
     content_id = int(content_id_str)
     sender_id = int(sender_id_str)
     table = "topics" if action.startswith("topic") else "chats"
+
 
     if "approve" in action:
         await db.Database().approve_chat_adding(chatID=content_id)

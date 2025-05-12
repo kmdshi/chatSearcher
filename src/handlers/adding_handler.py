@@ -48,7 +48,7 @@ async def on_topic_selected(callback: CallbackQuery, widget: ManagedWidget, mana
 
     state: FSMContext = manager.middleware_data.get("state")
 
-    await state.update_data(topicId=item_id)
+    await state.update_data(topic_id=item_id)
 
     await callback.message.answer(
         f"🌟 <b>Выбран топик</b>: <code>{item_id}</code>\n\nТеперь выберите название для чата!", parse_mode="HTML"
@@ -198,6 +198,8 @@ async def process_chat_link(message: Message, state: FSMContext):
             parse_mode="HTML"
         )
         return
+
+    print(topic_id, 'ЧАТАЙДИ')
 
     chat_id = await db.Database().register_chat(topic_id=topic_id, creator_id=message.from_user.id, chat_name=name, chat_link=link)
 

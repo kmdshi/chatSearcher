@@ -122,7 +122,6 @@ class Database:
     async def approve_chat_adding(self, chatID):
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.cursor()
-
             await cursor.execute("UPDATE chats SET is_approved = 1 WHERE id = ?", (chatID,))
             await db.commit()
 
