@@ -120,9 +120,9 @@ async def process_topic_name(message: Message, state: FSMContext):
 
     topic_name = message.text
 
-    if len(topic_name) > 10:
+    if len(topic_name) > 25:
         await message.answer(
-            "<b>❌ Название топика должно быть менее 10 символов</b>\n\n<i>Пожалуйста, выберите более короткое название.</i>",
+            "<b>❌ Название топика должно быть менее 25 символов</b>\n\n<i>Пожалуйста, выберите более короткое название.</i>",
             parse_mode="HTML"
         )
         return
