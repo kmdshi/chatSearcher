@@ -167,9 +167,9 @@ async def start_message_handler(message: Message, state: FSMContext, dialog_mana
 
 @adding_router.message(StateFilter(ChatForm.name))
 async def process_chat_name(message: Message, state: FSMContext):
-    if len(message.text) > 10:
+    if len(message.text) > 25:
         await message.answer(
-            "<b>Название чата должно быть менее 10 символов.</b> ❌\n\n<i>Пожалуйста, попробуйте снова!</i>",
+            "<b>Название чата должно быть менее 25 символов.</b> ❌\n\n<i>Пожалуйста, попробуйте снова!</i>",
             parse_mode="HTML"
         )
         return
