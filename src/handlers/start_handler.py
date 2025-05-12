@@ -12,4 +12,10 @@ start_router = Router()
 async def start_message_handler(message: Message):
     kb = create_main_kb()
     await db.Database().register_user(message.from_user.id)
-    await message.answer(f'Хе-хе! Совсем скоро ^-^', reply_markup=kb)
+    await message.answer(
+        f"Привет, <b>{message.from_user.first_name}</b>! 👋\n\n"
+        "Выбирай тему, создавай чаты или присоединяйся к существующим\n\n"
+        "И, конечно, главное — находи единомышленников и круто проводи время!",
+        reply_markup=kb,
+        parse_mode="HTML"
+    )
